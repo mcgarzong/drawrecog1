@@ -16,34 +16,30 @@ def encode_image_to_base64(image_path):
     except FileNotFoundError:
         return "Error: La imagen no se encontró en la ruta especificada."
 
-# --- Configuración de página ---
+# --- Configuración de la página ---
 st.set_page_config(page_title="Tablero Inteligente", page_icon="🧠", layout="wide")
 st.title("🧠 Tablero para dibujo")
 
 # --- Sidebar con propiedades del tablero ---
 with st.sidebar:
-    st.header("Propiedades del Tablero")
+    st.header("🎨 Propiedades del Tablero")
 
     st.subheader("Dimensiones del Tablero")
-    width = st.slider("Ancho del tablero", 200, 800, 500)
+    width = st.slider("Ancho del tablero", 200, 1000, 500)
     height = st.slider("Alto del tablero", 200, 800, 400)
 
-    st.subheader("Herramienta de Dibujo:")
+    st.subheader("Herramienta de Dibujo")
     drawing_mode = st.selectbox(
         "Selecciona la herramienta de dibujo:",
         ("freedraw", "line", "rect", "circle", "transform")
     )
 
     stroke_width = st.slider("Selecciona el ancho de línea", 1, 30, 5)
-
-    st.subheader("Color de trazo")
     stroke_color = st.color_picker("Color del trazo", "#00FF88")
-
-    st.subheader("Color de fondo")
     bg_color = st.color_picker("Color de fondo", "#000000")
 
 # --- Área principal ---
-st.write("Dibuja el boceto en el panel y presiona el botón para analizarlo 👇")
+st.write("✏️ Dibuja el boceto en el panel y presiona el botón para analizarlo")
 
 # --- Canvas de dibujo ---
 canvas_result = st_canvas(
