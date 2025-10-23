@@ -7,7 +7,6 @@ from PIL import Image
 import numpy as np
 from streamlit_drawable_canvas import st_canvas
 
-# --- Función para codificar la imagen ---
 def encode_image_to_base64(image_path):
     try:
         with open(image_path, "rb") as image_file:
@@ -16,32 +15,32 @@ def encode_image_to_base64(image_path):
     except FileNotFoundError:
         return "Error: La imagen no se encontró en la ruta especificada."
 
-# --- Configuración de la página ---
-st.set_page_config(page_title="Tablero Inteligente", page_icon="🧠", layout="wide")
-st.title("🧠 Tablero para dibujo")
+st.set_page_config(page_title="Canvas Vivo", page_icon="🌿", layout="wide")
 
-# --- Sidebar con propiedades del tablero ---
+st.markdown("""
+# 🌿 **Canvas Vivo**
+### Donde cada trazo cobra vida
+En este lienzo digital, tus líneas son más que formas:  
+son señales que despiertan la curiosidad de una mente artificial.  
+Dibuja, interpreta y deja que la tecnología lea la emoción detrás del color y la forma.
+""")
+
 with st.sidebar:
-    st.header("🎨 Propiedades del Tablero")
-
-    st.subheader("Dimensiones del Tablero")
-    width = st.slider("Ancho del tablero", 200, 1000, 500)
-    height = st.slider("Alto del tablero", 200, 800, 400)
-
-    st.subheader("Herramienta de Dibujo")
+    st.header("🎨 Propiedades del Canvas")
+    st.subheader("Dimensiones del lienzo")
+    width = st.slider("Ancho", 200, 1000, 500)
+    height = st.slider("Alto", 200, 800, 400)
+    st.subheader("Herramienta de dibujo")
     drawing_mode = st.selectbox(
-        "Selecciona la herramienta de dibujo:",
+        "Selecciona la herramienta:",
         ("freedraw", "line", "rect", "circle", "transform")
     )
-
-    stroke_width = st.slider("Selecciona el ancho de línea", 1, 30, 5)
+    stroke_width = st.slider("Grosor del trazo", 1, 30, 5)
     stroke_color = st.color_picker("Color del trazo", "#00FF88")
     bg_color = st.color_picker("Color de fondo", "#000000")
 
-# --- Área principal ---
-st.write("✏️ Dibuja el boceto en el panel y presiona el botón para analizarlo")
+st.markdown("🖌️ Dibuja libremente y deja que **Canvas Vivo** interprete lo que nace de tu trazo.")
 
-# --- Canvas de dibujo ---
 canvas_result = st_canvas(
     fill_color="rgba(255, 165, 0, 0.3)",
     stroke_width=stroke_width,
@@ -50,33 +49,27 @@ canvas_result = st_canvas(
     height=height,
     width=width,
     drawing_mode=drawing_mode,
-    key="canvas",
+    key="canvas_vivo",
 )
 
-# --- Clave de API ---
 ke = st.text_input("🔑 Ingresa tu clave de OpenAI", type="password")
 os.environ["OPENAI_API_KEY"] = ke
 api_key = os.environ.get("OPENAI_API_KEY", "")
 
-# --- Inicializar cliente ---
 client = OpenAI(api_key=api_key)
 
-# --- Botón para analizar ---
-analyze_button = st.button("✨ Analizar la imagen")
+analyze_button = st.button("🌸 Interpretar el dibujo")
 
 if canvas_result.image_data is not None and api_key and analyze_button:
-    with st.spinner("Analizando..."):
-        # Convertir imagen del canvas
+    with st.spinner("🌱 La mente digital observa tu creación..."):
         input_numpy_array = np.array(canvas_result.image_data)
         input_image = Image.fromarray(input_numpy_array.astype("uint8"), "RGBA")
-        input_image.save("img.png")
-
-        # Codificar en base64
-        base64_image = encode_image_to_base64("img.png")
-
-        # Prompt
-        prompt_text = "Describe brevemente en español lo que ves en la imagen."
-
+        input_image.save("canvas_vivo_img.png")
+        base64_image = encode_image_to_base64("canvas_vivo_img.png")
+        prompt_text = (
+            "Observa este dibujo como si fuera parte de una obra interactiva. "
+            "Interpreta con brevedad qué podría representar o transmitir emocionalmente, en español."
+        )
         try:
             response = openai.chat.completions.create(
                 model="gpt-4o-mini",
@@ -94,14 +87,10 @@ if canvas_result.image_data is not None and api_key and analyze_button:
                 ],
                 max_tokens=400,
             )
-
             result = response.choices[0].message.content
-            st.success("✅ Resultado del análisis:")
+            st.success("🌿 Interpretación del Canvas Vivo:")
             st.markdown(result)
-
         except Exception as e:
-            st.error(f"Ocurrió un error: {e}")
-
+            st.error(f"Ocurrió un error durante la interpretación: {e}")
 elif not api_key:
-    st.warning("⚠️ Por favor ingresa tu clave API antes de analizar.")
-
+    st.warning("🔒 Ingresa tu clave de OpenAI antes de continuar con la interpretación.")
